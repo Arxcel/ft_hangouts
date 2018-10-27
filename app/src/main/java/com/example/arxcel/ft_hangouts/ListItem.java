@@ -5,19 +5,19 @@ package com.example.arxcel.ft_hangouts;
  */
 
 public class ListItem {
-    private String name;
+    private String firstName;
 
     public String getName() {
-        return name;
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String firstName) {
+        this.firstName = firstName;
     }
 
 
-    public ListItem(String name) {
+    public ListItem(String firstName) {
 
-        this.name = name;
+        this.firstName = firstName;
     }
 }

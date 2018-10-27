@@ -17,9 +17,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            db.execSQL(ContactDatabaseAdapter.DATABASE_CREATE);
-        } catch (Exception er){
-            Log.e("Error","exceptioin");
+            db.execSQL(ContactDatabaseAdapter.getCreationQuery());
+        } catch (Exception er) {
+
+            Log.e("Error","exception");
         }
     }
 
@@ -34,7 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // previous versions can be handled by comparing _oldVersion and _newVersion
         // values.
         // The simplest case is to drop the old table and create a new one.
-        _db.execSQL("DROP TABLE IF EXISTS " + "LOGIN");
+        String cmd = new String("DROP TABLE IF EXISTS CONTACTS");
+        _db.execSQL(cmd);
         // Create a new one.
         onCreate(_db);
     }

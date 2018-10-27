@@ -24,13 +24,11 @@ public class ListAdapter extends ArrayAdapter<ListItem> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        return super.getView(position, convertView, parent);
-//        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
-//        ListItem item = getItem(position);
-//
-//        TextView name = convertView.findViewById(R.id.mName);
-//
-//        name.setText(item.getName());
-//        return convertView;
+//        return super.getView(position, convertView, parent);
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
+        ListItem item = getItem(position);
+        TextView name = convertView.findViewById(R.id.mName);
+        name.setText(item.getName());
+        return convertView;
     }
 }

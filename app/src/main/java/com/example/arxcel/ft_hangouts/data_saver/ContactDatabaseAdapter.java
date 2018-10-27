@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.SQLException;
 import android.database.Cursor;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -16,13 +17,12 @@ public class ContactDatabaseAdapter {
 
     static final String DATABASE_NAME = "contactsDatabase.db";
     static final String TABLE_NAME = "CONTACTS";
+    static final String COL1 = "ID integer primary key autoincrement";
+    static final String COL2 = "FIRSTNAME text";
+    static final String COL3 = "LASTNAME text";
+    static final String COL4 = "EMAIL text";
 
-    static final int DATABASE_VERSION = 1;
-    static final String DATABASE_CREATE = "create table CONTACT(" +
-            "ID integer primary key autoincrement," +
-            "FIRSTNAME  text," +
-            "LASTNAME  text," +
-            "EMAIL text); ";
+    static final int DATABASE_VERSION = 2;
 
     // Variable to hold the database instance
     public static SQLiteDatabase db;
@@ -31,13 +31,19 @@ public class ContactDatabaseAdapter {
     // Database open/upgrade helper
     private static DatabaseHelper dbHelper;
 
-    public  ContactDatabaseAdapter(Context _context)
+    public ContactDatabaseAdapter(Context _context)
     {
         context = _context;
         dbHelper = new DatabaseHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public  ContactDatabaseAdapter open() throws SQLException
+    @NonNull
+    static String getCreationQuery()
+    {
+        return new String("create table " + TABLE_NAME + "(" + COL1 + "," + COL2 + "," + COL3 + "," + COL4 +");");
+    }
+
+    public ContactDatabaseAdapter open() throws SQLException
     {
         db = dbHelper.getWritableDatabase();
         return this;
@@ -56,15 +62,15 @@ public class ContactDatabaseAdapter {
 
     public boolean insertEntry(Contact contact)
     {
+        Log.e("Note", "Trying to insert contact");
+
         try {
             ContentValues newValues = new ContentValues();
-            // Assign values for each column.
+//            // Assign values for each column.
             newValues.put("FIRSTNAME", contact.getFirstName());
             newValues.put("LASTNAME", contact.getLastName());
             newValues.put("EMAIL", contact.getEmail());
 
-            // Insert the row into your table
-            db = dbHelper.getWritableDatabase();
             long result = db.insert(TABLE_NAME, null, newValues);
             if (result != -1)
             {
@@ -74,7 +80,7 @@ public class ContactDatabaseAdapter {
             else
                 return false;
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println("Exceptions " + ex);
             Log.e("Note", "One row entered");
             return false;
@@ -125,7 +131,7 @@ public class ContactDatabaseAdapter {
     public List<Contact> getAllContacts()
     {
         List<Contact> contacts = new ArrayList<Contact>();
-        String sql = "select * from table";
+        String sql = new String("select * from " + TABLE_NAME);
         Cursor  cursor = db.rawQuery(sql,null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {

@@ -13,7 +13,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:elevation="0dp"
-        android:onClick="foo"
+        android:onClick="createContact"
         android:text="+" />
 
     <ListView
