@@ -62,8 +62,6 @@ public class ContactDatabaseAdapter {
 
     public boolean insertEntry(Contact contact)
     {
-        Log.e("Note", "Trying to insert contact");
-
         try {
             ContentValues newValues = new ContentValues();
 //            // Assign values for each column.
@@ -89,8 +87,7 @@ public class ContactDatabaseAdapter {
 
     public int deleteEntry(String id)
     {
-        String where="USERNAME=?";
-        int numberOFEntriesDeleted= db.delete("ID", where, new String[]{ id }) ;
+        int numberOFEntriesDeleted= db.delete(TABLE_NAME, "ID=?", new String[]{ id }) ;
         Toast.makeText(context, "Number fo Entry Deleted Successfully : " + numberOFEntriesDeleted, Toast.LENGTH_LONG).show();
         return numberOFEntriesDeleted;
     }

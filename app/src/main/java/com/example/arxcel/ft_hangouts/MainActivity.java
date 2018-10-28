@@ -3,14 +3,18 @@ package com.example.arxcel.ft_hangouts;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.arxcel.ft_hangouts.data_saver.Contact;
 import com.example.arxcel.ft_hangouts.data_saver.ContactDatabaseAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,21 +38,24 @@ public class MainActivity extends AppCompatActivity {
         contacts = contactDatabaseAdapter.getAllContacts();
         for (Contact contact : contacts)
         {
-            items.add(new ListItem(contact.getFirstName()));
+            items.add(new ListItem(contact));
         }
-
+        items.sort(Comparator.comparing(ListItem::getFirstName));
         adapter = new ListAdapter(MainActivity.this, items);
         list.setAdapter(adapter);
 
-
         list.setClickable(true);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-
-                Object o = list.getItemAtPosition(position);
-
+                ListItem item = (ListItem)list.getItemAtPosition(position);
+                Intent i = new Intent(MainActivity.this, ContactActivity.class);
+                i.putExtra("newContact", false);
+                i.putExtra("firstName", item.getFirstName());
+                i.putExtra("lastName", item.getLastName());
+                i.putExtra("email", item.getEmail());
+                i.putExtra("id", item.getId());
+                startActivity(i);
             }
         });
     }
@@ -57,5 +64,17 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent i = new Intent(MainActivity.this, ContactEditActivity.class);
         startActivity(i);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK ) {
+            super.finish();
+            return true;
+        }
+        else
+        {
+            return super.onKeyDown(keyCode, event);
+        }
     }
 }

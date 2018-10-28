@@ -3,6 +3,7 @@ package com.example.arxcel.ft_hangouts;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -55,6 +56,17 @@ public class ContactActivity extends AppCompatActivity {
         i.putExtra("lastName", lastName);
         i.putExtra("email", email);
         i.putExtra("id", id);
+        startActivity(i);
+    }
+    public void deleteContact(View view)
+    {
+        try {
+            contactDatabaseAdapter.deleteEntry(Integer.toString(id));
+        } catch (Exception e)
+        {
+            Log.d("Tag", "Exception!!!");
+        }
+        Intent i = new Intent(ContactActivity.this, MainActivity.class);
         startActivity(i);
     }
 }
