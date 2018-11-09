@@ -5,12 +5,16 @@ import android.content.ContentValues;
 import android.database.SQLException;
 import android.database.Cursor;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.sql.Blob;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Base64;
 
 public class ContactDatabaseAdapter {
     String ok = "OK";
@@ -21,8 +25,9 @@ public class ContactDatabaseAdapter {
     static final String COL2 = "FIRSTNAME text";
     static final String COL3 = "LASTNAME text";
     static final String COL4 = "EMAIL text";
+    static final String COL5 = "PHONE text";
 
-    static final int DATABASE_VERSION = 2;
+    static final int DATABASE_VERSION = 8;
 
     // Variable to hold the database instance
     public static SQLiteDatabase db;
@@ -40,7 +45,7 @@ public class ContactDatabaseAdapter {
     @NonNull
     static String getCreationQuery()
     {
-        return new String("create table " + TABLE_NAME + "(" + COL1 + "," + COL2 + "," + COL3 + "," + COL4 +");");
+        return new String("create table " + TABLE_NAME + "(" + COL1 + "," + COL2 + "," + COL3 + "," + COL4 + "," + COL5 + ");");
     }
 
     public ContactDatabaseAdapter open() throws SQLException
@@ -68,6 +73,8 @@ public class ContactDatabaseAdapter {
             newValues.put("FIRSTNAME", contact.getFirstName());
             newValues.put("LASTNAME", contact.getLastName());
             newValues.put("EMAIL", contact.getEmail());
+            newValues.put("PHONE", contact.getPhone());
+//            newValues.put("AVATAR", Base64.encodeToString(image, 0));
 
             long result = db.insert(TABLE_NAME, null, newValues);
             if (result != -1)
@@ -77,7 +84,6 @@ public class ContactDatabaseAdapter {
             }
             else
                 return false;
-
         } catch (Exception ex) {
             System.out.println("Exceptions " + ex);
             Log.e("Note", "One row entered");
@@ -88,14 +94,11 @@ public class ContactDatabaseAdapter {
     public int deleteEntry(String id)
     {
         int numberOFEntriesDeleted= db.delete(TABLE_NAME, "ID=?", new String[]{ id }) ;
-        Toast.makeText(context, "Number fo Entry Deleted Successfully : " + numberOFEntriesDeleted, Toast.LENGTH_LONG).show();
         return numberOFEntriesDeleted;
     }
-
-    // method to get the password  of userName
     public Contact getSinlgeEntry(String id)
     {
-        Contact contact = new Contact("", "", "");
+        Contact contact = new Contact("", "", "", "", null);
         db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, "ID=?", new String[]{ id }, null, null, null);
         if(cursor.getCount() >= 1) // UserName Not Exist
@@ -105,10 +108,12 @@ public class ContactDatabaseAdapter {
             contact.setLastName(cursor.getString(cursor.getColumnIndex("LASTNAME")));
             contact.setEmail(cursor.getString(cursor.getColumnIndex("EMAIL")));
             contact.setId(cursor.getInt(cursor.getColumnIndex("ID")));
+            contact.setPhone(cursor.getString(cursor.getColumnIndex("PHONE")));
+//            byte[] imgByte = cursor.getBlob(cursor.getColumnIndex("AVATAR"));
+//            contact.setAvatar(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
         }
         return contact;
     }
-
     // Method to Update an Existing
     public void  updateEntry(Contact contact)
     {
@@ -116,32 +121,43 @@ public class ContactDatabaseAdapter {
         ContentValues updatedValues = new ContentValues();
 
         // Assign values for each Column.
-        updatedValues.put("USERNAME", contact.getFirstName());
+        updatedValues.put("FIRSTNAME", contact.getFirstName());
         updatedValues.put("LASTNAME", contact.getLastName());
         updatedValues.put("EMAIL", contact.getEmail());
-
+        updatedValues.put("PHONE", contact.getPhone());
+//        updatedValues.put("AVATAR",  getBitmapAsByteArray(contact.getAvatar()));
         String where="ID = ?";
         db.update(TABLE_NAME, updatedValues, where, new String[]{String.valueOf(contact.getId())});
     }
 
 
-    public List<Contact> getAllContacts()
+    public ArrayList<Contact> getAllContacts()
     {
-        List<Contact> contacts = new ArrayList<Contact>();
+        ArrayList<Contact> contacts = new ArrayList<Contact>();
         String sql = new String("select * from " + TABLE_NAME);
         Cursor  cursor = db.rawQuery(sql,null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-
-                Contact contact = new Contact("", "", "");
+                Contact contact = new Contact("", "", "", "", null);
                 contact.setFirstName(cursor.getString(cursor.getColumnIndex("FIRSTNAME")));
                 contact.setLastName(cursor.getString(cursor.getColumnIndex("LASTNAME")));
                 contact.setEmail(cursor.getString(cursor.getColumnIndex("EMAIL")));
                 contact.setId(cursor.getInt(cursor.getColumnIndex("ID")));
+                contact.setPhone(cursor.getString(cursor.getColumnIndex("PHONE")));
+//                byte[] imgByte = cursor.getBlob(cursor.getColumnIndex("AVATAR"));
+//                contact.setAvatar(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
                 contacts.add(contact);
                 cursor.moveToNext();
             }
         }
         return contacts;
     }
+
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
 }
+
+

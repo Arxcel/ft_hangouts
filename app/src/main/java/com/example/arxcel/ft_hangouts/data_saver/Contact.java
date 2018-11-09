@@ -1,25 +1,43 @@
 package com.example.arxcel.ft_hangouts.data_saver;
 
-/**
- * Created by arxcel on 10/27/18.
- */
+import android.graphics.Bitmap;
 
-public class Contact {
+public class Contact  {
     private String firstName;
     private String lastName;
     private String email;
+    private String phone;
+    private int id = -1;
+    private Bitmap avatar;
 
-    public Contact(String firstName, String lastName, String email) {
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Bitmap getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Bitmap avatar) {
+        this.avatar = avatar;
+    }
+
+    public Contact(String firstName, String lastName, String email, String phone, Bitmap avatar) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.phone = phone;
+        this.avatar = avatar;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    private int id = -1;
 
     public int getId() {
         return id;
