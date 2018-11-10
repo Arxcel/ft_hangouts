@@ -10,17 +10,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.arxcel.ft_hangouts.data_saver.Contact;
 import com.example.arxcel.ft_hangouts.data_saver.ContactDatabaseAdapter;
-
-import java.security.Permission;
 
 public class ContactActivity extends AppCompatActivity {
     SharedPreferences mPrefs;
@@ -32,7 +27,6 @@ public class ContactActivity extends AppCompatActivity {
     TextView mEmail;
     TextView mPhone;
 
-
     String firstName;
     String lastName;
     String email;
@@ -40,9 +34,11 @@ public class ContactActivity extends AppCompatActivity {
     int id;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        switch (mPrefs.getString("color", "red")) {
+        switch (mPrefs.getString("color", "red"))
+        {
             case "red":
                 setTheme(R.style.RedTheme);
                 break;
@@ -62,7 +58,8 @@ public class ContactActivity extends AppCompatActivity {
         mPhone = findViewById(R.id.mPhone);
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null) {
+        if (extras != null)
+        {
             firstName = extras.getString("firstName");
             lastName = extras.getString("lastName");
             email = extras.getString("email");
@@ -89,7 +86,8 @@ public class ContactActivity extends AppCompatActivity {
     }
     public void deleteContact(View view)
     {
-        try {
+        try
+        {
             contactDatabaseAdapter.deleteEntry(Integer.toString(id));
         } catch (Exception e)
         {
@@ -101,27 +99,37 @@ public class ContactActivity extends AppCompatActivity {
 
     public void callContact(View view)
     {
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phone, null));
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(ContactActivity.this, new String[]{Manifest.permission.CALL_PHONE}, 1);
-        startActivity(intent);
+        else
+        {
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phone, null));
+            startActivity(intent);
+        }
     }
 
     public void sendSMS(View view)
     {
-        Intent i = new Intent(ContactActivity.this, Chat.class);
-        i.putExtra("receiverNumber", phone);
-        startActivity(i);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(ContactActivity.this, new String[]{Manifest.permission.READ_SMS}, 4);
+        else
+        {
+            Intent i = new Intent(ContactActivity.this, Chat.class);
+            i.putExtra("receiverNumber", phone);
+            startActivity(i);
+        }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
         SharedPreferences.Editor editor = mPrefs.edit();
         switch (id) {
@@ -143,6 +151,5 @@ public class ContactActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 }

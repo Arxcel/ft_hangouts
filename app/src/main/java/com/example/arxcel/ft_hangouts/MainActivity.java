@@ -1,24 +1,20 @@
 package com.example.arxcel.ft_hangouts;
 
-import android.app.Application;
-import android.content.ContentResolver;
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
-import android.provider.Telephony;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDelegate;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arxcel.ft_hangouts.data_saver.Contact;
@@ -26,7 +22,6 @@ import com.example.arxcel.ft_hangouts.data_saver.ContactDatabaseAdapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     ContactDatabaseAdapter contactDatabaseAdapter;
@@ -49,7 +44,14 @@ public class MainActivity extends AppCompatActivity {
             default:
                 setTheme(R.style.GreenTheme);
         }
-
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 2);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, 3);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_SMS}, 4);
         isReturnPressed = false;
         super.onCreate(savedInstanceState);
         contactDatabaseAdapter = new ContactDatabaseAdapter(getApplicationContext());
@@ -134,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
             }
             else
             {
-//                getAllSms(getApplicationContext());
                 Toast.makeText(getApplicationContext(), "Press one more time to exit", Toast.LENGTH_LONG).show();
                 isReturnPressed = true;
             }
@@ -155,6 +156,4 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
     }
-
-
 }

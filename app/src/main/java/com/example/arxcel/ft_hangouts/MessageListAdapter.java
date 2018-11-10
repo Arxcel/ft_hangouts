@@ -24,9 +24,13 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         Message c = getItem(position);
         TextView message = convertView.findViewById(R.id.mMessage);
         TextView date = convertView.findViewById(R.id.mDate);
-
+        TextView sender = convertView.findViewById(R.id.mSender);
         message.setText(c.getMessage());
         date.setText(c.getDate());
+//        if (c.isOwn())
+//            sender.setText("Me");
+//        else
+//            sender.setText(c.getFrom());
         return convertView;
     }
 }

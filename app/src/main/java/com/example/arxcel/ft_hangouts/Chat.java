@@ -3,7 +3,6 @@ package com.example.arxcel.ft_hangouts;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,7 +13,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,9 +20,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.arxcel.ft_hangouts.data_saver.Contact;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Chat extends AppCompatActivity {
@@ -65,48 +62,45 @@ public class Chat extends AppCompatActivity {
     public void sendMessage(View view)
     {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(Chat.this, new String[]{Manifest.permission.SEND_SMS}, 1);
-
-        SmsManager smsManager = SmsManager.getDefault();
-        String mBody = message.getText().toString();
-        smsManager.sendTextMessage(receiverNumber, null, mBody, null, null);
-        Toast.makeText(getApplicationContext(), "Message sent", Toast.LENGTH_LONG).show();
+            ActivityCompat.requestPermissions(Chat.this, new String[]{Manifest.permission.SEND_SMS}, 2);
+        else
+        {
+            SmsManager smsManager = SmsManager.getDefault();
+            String mBody = message.getText().toString();
+            message.setText("");
+            smsManager.sendTextMessage(receiverNumber, null, mBody, null, null);
+            Toast.makeText(getApplicationContext(), "Message sent", Toast.LENGTH_LONG).show();
+            Date currentTime = Calendar.getInstance().getTime();
+            messages.add(new Message(currentTime.toString(), mBody, "Me", true));
+        }
     }
 
     public void getSMS(Context context) {
-        ContentResolver cr = context.getContentResolver();
-        Cursor c = cr.query(Telephony.Sms.CONTENT_URI, null, null, null, null);
-        int totalSMS = 0;
-        if (c != null) {
-            totalSMS = c.getCount();
-            if (c.moveToFirst()) {
-                for (int j = 0; j < totalSMS; j++) {
-                    String smsDate = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.DATE));
-                    String number = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
-                    String body = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.BODY));
-                    Date dateFormat= new Date(Long.valueOf(smsDate));
-                    String type;
-                    switch (Integer.parseInt(c.getString(c.getColumnIndexOrThrow(Telephony.Sms.TYPE)))) {
-                        case Telephony.Sms.MESSAGE_TYPE_INBOX:
-                            type = "inbox";
-                            break;
-                        case Telephony.Sms.MESSAGE_TYPE_SENT:
-                            type = "sent";
-                            break;
-                        case Telephony.Sms.MESSAGE_TYPE_OUTBOX:
-                            type = "outbox";
-                            break;
-                        default:
-                            break;
-                    }
-                    c.moveToNext();
-                    if (number.equals(receiverNumber))
-                    {
-                        messages.add(new Message(dateFormat.toString(), body, number));
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(Chat.this, new String[]{Manifest.permission.READ_SMS}, 4);
+        else
+        {
+            ContentResolver cr = context.getContentResolver();
+            Cursor c = cr.query(Telephony.Sms.CONTENT_URI, null, null, null, null);
+            int totalSMS;
+            if (c != null) {
+                totalSMS = c.getCount();
+                if (c.moveToFirst()) {
+                    for (int j = 0; j < totalSMS; j++) {
+                        String smsDate = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.DATE));
+                        String number = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
+                        String body = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.BODY));
+                        Date dateFormat= new Date(Long.valueOf(smsDate));
+
+                        c.moveToNext();
+                        if (number.equals(receiverNumber))
+                        {
+                            messages.add(new Message(dateFormat.toString(), body, number, false));
+                        }
                     }
                 }
+                c.close();
             }
-            c.close();
         }
     }
 
@@ -139,6 +133,5 @@ public class Chat extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 }

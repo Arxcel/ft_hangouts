@@ -153,6 +153,13 @@ public class ContactDatabaseAdapter {
         return contacts;
     }
 
+    public boolean isContains(String number)
+    {
+        db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, "PHONE=?", new String[]{ number }, null, null, null);
+        return cursor.getCount() >= 1;
+    }
+
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
